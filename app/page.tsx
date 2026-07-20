@@ -15,17 +15,17 @@ export default function Home() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/jobs")
-      .then((res) => res.json())
-      .then((data) => {
-        setJobs(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching jobs:", err);
-        setLoading(false);
-      });
-  }, []);
+  fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs`)
+    .then((res) => res.json())
+    .then((data) => {
+      setJobs(data);
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error("Error fetching jobs:", err);
+      setLoading(false);
+    });
+}, []);
 
   const filteredJobs = jobs.filter(
     (job) =>
