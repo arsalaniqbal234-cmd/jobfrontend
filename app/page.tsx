@@ -18,6 +18,7 @@ const [loadingMore, setLoadingMore] = useState(false);
 const [search, setSearch] = useState("");
 const [offset, setOffset] = useState(0);
 const [hasMore, setHasMore] = useState(true);
+const [error, setError] = useState(false);
 const LIMIT = 20;
 
   useEffect(() => {
@@ -29,9 +30,10 @@ const LIMIT = 20;
       setLoading(false);
     })
     .catch((err) => {
-      console.error("Error fetching jobs:", err);
-      setLoading(false);
-    });
+  console.error("Error fetching jobs:", err);
+  setError(true);
+  setLoading(false);
+});
 }, []);
 
 useEffect(() => {
@@ -49,9 +51,10 @@ useEffect(() => {
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Error searching jobs:", err);
-        setLoading(false);
-      });
+  console.error("Error searching jobs:", err);
+  setError(true);
+  setLoading(false);
+});
   }, 400);
 
   return () => clearTimeout(timer);
@@ -87,6 +90,15 @@ const loadMore = () => {
     "bg-teal-50 text-teal-600",
     "bg-orange-50 text-orange-600",
   ];
+
+  const getAvatarStyle = (company: string) => {
+  let hash = 0;
+  for (let i = 0; i < company.length; i++) {
+    hash = company.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % avatarStyles.length;
+  return avatarStyles[index];
+};
 
   const handleJobClick = (url: string) => {
     if (url) window.open(url, "_blank", "noopener,noreferrer");
@@ -238,11 +250,29 @@ const loadMore = () => {
           </div>
         )}
 
-        {!loading && jobs.length === 0 && (
-          <div className="text-center text-slate-400 py-24 font-medium">
-            No jobs match your search.
-          </div>
-        )}
+      {!loading && error && (
+  <div className="text-center text-red-500 py-24 font-medium">
+    Failed to load jobs. Please try again later.
+  </div>
+)}
+
+{!loading && error && (
+  <div className="text-center text-red-500 py-24 font-medium">
+    Failed to load jobs. Please try again later.
+  </div>
+)}
+
+{!loading && error && (
+  <div className="text-center text-red-500 py-24 font-medium">
+    Failed to load jobs. Please try again later.
+  </div>
+)}
+
+{!loading && !error && jobs.length === 0 && (
+  <div className="text-center text-slate-400 py-24 font-medium">
+    No jobs match your search.
+  </div>
+)}
 
         <div className="grid gap-3">
           {jobs.map((job, i) => (
@@ -253,8 +283,8 @@ const loadMore = () => {
             >
               <div
                 className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-sm shrink-0 ${
-                  avatarStyles[i % avatarStyles.length]
-                }`}
+  getAvatarStyle(job.company)
+}`}
               >
                 {initials(job.company)}
               </div>
